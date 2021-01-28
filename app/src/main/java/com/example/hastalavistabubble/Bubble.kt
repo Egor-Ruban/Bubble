@@ -3,13 +3,13 @@ package com.example.hastalavistabubble
 import android.content.Context
 import android.graphics.Rect
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import android.view.ViewPropertyAnimator
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import java.lang.Math.abs
 import kotlin.random.Random
-
 
 class Bubble @JvmOverloads constructor(
         context: Context,
@@ -86,10 +86,10 @@ class Bubble @JvmOverloads constructor(
     private fun restartMove(){
         x = lastX
         y = lastY
+        animation.cancel()
         post{
             move()
         }
-        animation.cancel()
     }
 
     // onHitBubble knows how to deal with hits
@@ -167,6 +167,17 @@ class Bubble @JvmOverloads constructor(
         )
 
         return rect1.intersect(rect2)
+    }
+
+    private var isInFocus = true
+    override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
+        super.onWindowFocusChanged(hasWindowFocus)
+        if (isInFocus){
+            animation.cancel()
+        } else {
+            move()
+        }
+        isInFocus = !isInFocus
     }
 }
 
