@@ -3,6 +3,7 @@ package com.example.bubbles
 
 import android.annotation.SuppressLint
 import android.graphics.Rect
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.MotionEvent
 import android.widget.Toast
@@ -17,6 +18,10 @@ import kotlin.random.Random
 @SuppressLint("ClickableViewAccessibility")
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    private lateinit var backgrounds : Array<Drawable?>
+    private lateinit var bubbleDesigns : Array<Drawable?>
+    private lateinit var texts : Array<String>
+    private var currentDesign = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,6 +29,9 @@ class MainActivity : AppCompatActivity() {
         val rootView = binding.root
         setContentView(rootView)
 
+        initDesigns()
+        binding.field.background = backgrounds[currentDesign]
+        binding.design.text = texts[currentDesign]
         rootView.setOnTouchListener { _, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
@@ -46,6 +54,29 @@ class MainActivity : AppCompatActivity() {
             binding.field.forEach { v -> (v as Bubble).cancelAnim() }
             binding.field.removeAllViews()
         }
+
+        binding.design.setOnClickListener {
+            changeDesign()
+        }
+    }
+
+    private fun changeDesign() {
+        currentDesign = (currentDesign + 1) % 3
+        binding.field.background = backgrounds[currentDesign]
+        binding.design.text = texts[currentDesign]
+        binding.field.forEach { v -> v.background = bubbleDesigns[currentDesign] }
+    }
+
+    private fun initDesigns() {
+        backgrounds = arrayOf(ContextCompat.getDrawable(baseContext, R.drawable.normal_background),
+                ContextCompat.getDrawable(baseContext, R.drawable.grass),
+                ContextCompat.getDrawable(baseContext, R.color.black))
+        texts = arrayOf(getString(R.string.design_normal),
+                getString(R.string.design_weed),
+                getString(R.string.design_cherry))
+        bubbleDesigns = arrayOf(ContextCompat.getDrawable(baseContext, R.drawable.normal_bubble),
+                ContextCompat.getDrawable(baseContext, R.drawable.weed),
+                ContextCompat.getDrawable(baseContext, R.drawable.cherry))
     }
 
     private fun createBubble(
@@ -55,7 +86,7 @@ class MainActivity : AppCompatActivity() {
             speedX = Random.nextDouble(-20.0, 20.0)
             speedY = Random.nextDouble(-20.0, 20.0)
             speedDecreasePercentage = Random.nextInt(5, 20)
-            background = ContextCompat.getDrawable(baseContext, R.drawable.weed)
+            background = bubbleDesigns[currentDesign]
             x = getNewX(eventX, root.width, size)
             y = getNewY(eventY, root.height, top.toInt(), size)
             setOnTouchListener(
@@ -94,18 +125,18 @@ class MainActivity : AppCompatActivity() {
         val location = IntArray(2)
 
         val rect1 = Rect(
-                eventX - size / 2,
-                eventY - size / 2,
-                eventX + size / 2,
-                eventY + size / 2
+                eventX - size / 2 + 10,
+                eventY - size / 2 + 10,
+                eventX + size / 2 - 10,
+                eventY + size / 2 - 10
         )
 
         bubble.getLocationInWindow(location)
         val rect2 = Rect(
-                location[0] + 5,
-                location[1] + 5,
-                location[0] + bubble.width - 5,
-                location[1] + bubble.height - 5
+                location[0] + 10,
+                location[1] + 10,
+                location[0] + bubble.width - 10,
+                location[1] + bubble.height - 10
         )
 
         return rect1.intersect(rect2)

@@ -33,11 +33,12 @@ class Bubble @JvmOverloads constructor(
     private var screenHeight: Int = 0
 
     fun cancelAnim(){
-        animation.cancel()
+        if (!isStopped()){
+            animation.cancel()
+        }
     }
 
     fun move(screenStartY : Int, screenWidth: Int, screenHeight: Int){
-        isOnDrag = false
         this.screenStartY = screenStartY
         this.screenWidth = screenWidth
         this.screenHeight = screenHeight
@@ -161,18 +162,18 @@ class Bubble @JvmOverloads constructor(
 
         getLocationInWindow(location)
         val rect1 = Rect(
-                location[0] + 5,
-                location[1] + 5,
-                location[0] + width - 5,
-                location[1] + height - 5
+                location[0] + 10,
+                location[1] + 10,
+                location[0] + width - 10,
+                location[1] + height - 10
         )
 
         bubble.getLocationInWindow(location)
         val rect2 = Rect(
-                location[0] + 5,
-                location[1] + 5,
-                location[0] + bubble.width - 5,
-                location[1] + bubble.height - 5
+                location[0] + 10,
+                location[1] + 10,
+                location[0] + bubble.width - 10,
+                location[1] + bubble.height - 10
         )
 
         return rect1.intersect(rect2)

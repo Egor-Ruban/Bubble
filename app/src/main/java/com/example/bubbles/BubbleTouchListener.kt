@@ -49,6 +49,7 @@ class BubbleTouchListener(
             MotionEvent.ACTION_UP -> {
                 if (isValidPlace(view.parent as ConstraintLayout, newX, newY, view.height, view)){
                     view as Bubble
+                    view.isOnDrag = false
                     view.speedX = (newX - lastX).toDouble()
                     view.speedY = (newY - lastY).toDouble()
                     view.move(screenStartY, screenWidth, screenHeight)
@@ -77,18 +78,18 @@ class BubbleTouchListener(
         val location = IntArray(2)
 
         val rect1 = Rect(
-                eventX,
-                eventY,
-                eventX + size,
-                eventY + size
+                eventX + 10,
+                eventY + 10,
+                eventX + size - 10,
+                eventY + size - 10
         )
 
         bubble.getLocationInWindow(location)
         val rect2 = Rect(
-                location[0],
-                location[1],
-                location[0] + bubble.width,
-                location[1] + bubble.height
+                location[0] + 10,
+                location[1] + 10,
+                location[0] + bubble.width - 10,
+                location[1] + bubble.height - 10
         )
         return rect1.intersect(rect2)
     }
