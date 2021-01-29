@@ -1,4 +1,4 @@
-package com.example.hastalavistabubble
+package com.example.bubbles
 
 import android.content.Context
 import android.graphics.Rect
@@ -19,6 +19,7 @@ class Bubble @JvmOverloads constructor(
     var speedX: Double = 1.0
     var speedY: Double = 1.0
     var speedDecreasePercentage : Int = 10
+    var isOnDrag : Boolean = false
 
     private var decelerationX : Double = 1.0
     private var decelerationY : Double = 1.0
@@ -27,10 +28,17 @@ class Bubble @JvmOverloads constructor(
 
     private lateinit var animation : ViewPropertyAnimator
 
+    private var screenStartY : Int = 0
     private var screenWidth: Int = 0
     private var screenHeight: Int = 0
 
-    fun move(screenWidth: Int, screenHeight: Int){
+    fun cancelAnim(){
+        animation.cancel()
+    }
+
+    fun move(screenStartY : Int, screenWidth: Int, screenHeight: Int){
+        isOnDrag = false
+        this.screenStartY = screenStartY
         this.screenWidth = screenWidth
         this.screenHeight = screenHeight
         move()
@@ -53,7 +61,7 @@ class Bubble @JvmOverloads constructor(
         if ((newX <= 0) || (newX >= screenWidth - this.width)) {
             onHitVerticalBorders()
             move()
-        } else if ((newY <= 0) || (newY >= screenHeight - this.height)) {
+        } else if ((newY <= screenStartY) || (newY >= screenHeight - this.height)) {
             onHitHorizontalBorders()
             move()
         } else {
@@ -67,9 +75,10 @@ class Bubble @JvmOverloads constructor(
                 .y(newY.toFloat())
                 .setUpdateListener {
                     for (bubble in (parent as ConstraintLayout).children){
-                        if (bubble != this){
+                        bubble as Bubble
+                        if (bubble != this && !bubble.isOnDrag && !isOnDrag){
                             if (isOverlap(bubble)){
-                                onHitBubble(bubble as Bubble)
+                                onHitBubble(bubble)
                             }
                         }
                     }
@@ -94,6 +103,7 @@ class Bubble @JvmOverloads constructor(
 
     // onHitBubble knows how to deal with hits
     private fun onHitBubble(bubble: Bubble){
+        Log.d("M_M", "shit")
         if (bubble.isStopped()){
             bubble.speedY = 0.5 * speedY
             bubble.speedX = 0.5 * speedX
@@ -117,7 +127,7 @@ class Bubble @JvmOverloads constructor(
 
     // randomSpeedChange returns random deviation of speed on hit
     private fun randomSpeedChange(speed : Double) : Double{
-        if (abs(speed) < 1) return 0.0
+        if (abs(speed) < 1) return Random.nextDouble((-5.0), 5.0)
         return if (speed < 0) Random.nextDouble((speed * 0.20), -(speed * 0.20))
         else Random.nextDouble(-(speed * 0.20), (speed * 0.20))
     }
@@ -152,18 +162,18 @@ class Bubble @JvmOverloads constructor(
 
         getLocationInWindow(location)
         val rect1 = Rect(
-                location[0] + 10,
-                location[1] + 15,
-                location[0] + width - 10,
-                location[1] + height - 15
+                location[0] + 5,
+                location[1] + 5,
+                location[0] + width - 5,
+                location[1] + height - 5
         )
 
         bubble.getLocationInWindow(location)
         val rect2 = Rect(
-                location[0] + 10,
-                location[1] + 15,
-                location[0] + bubble.width - 10,
-                location[1] + bubble.height - 15
+                location[0] + 5,
+                location[1] + 5,
+                location[0] + bubble.width - 5,
+                location[1] + bubble.height - 5
         )
 
         return rect1.intersect(rect2)
