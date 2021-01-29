@@ -103,7 +103,6 @@ class Bubble @JvmOverloads constructor(
 
     // onHitBubble knows how to deal with hits
     private fun onHitBubble(bubble: Bubble){
-        Log.d("M_M", "shit")
         if (bubble.isStopped()){
             bubble.speedY = 0.5 * speedY
             bubble.speedX = 0.5 * speedX

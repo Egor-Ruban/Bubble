@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Bubbles</string>
+    <string name="burst">bubble burst</string>
+    <string name="overlap">new bubble should not cover old bubbles</string>
 </resources>

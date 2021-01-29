@@ -35,8 +35,9 @@ class BubbleTouchListener(
                 lastY = view.y
                 newX = event.rawX + dX
                 newY = event.rawY + dY
-
-                if ((newX <= 0 || newX >= screenWidth - view.width) || (newY <= screenStartY || newY >= screenHeight - view.height)) {
+                val isOverBorder = (newX <= 0 || newX >= screenWidth - view.width) ||
+                        (newY <= screenStartY || newY >= screenHeight - view.height)
+                if (isOverBorder) {
                     return true
                 }
                 view.animate()
@@ -53,7 +54,7 @@ class BubbleTouchListener(
                     view.move(screenStartY, screenWidth, screenHeight)
                 } else {
                     view.visibility = View.GONE //todo check ,it may won`t work
-                    Toast.makeText(ctx, "пузырь лопнул", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(ctx, ctx.getString(R.string.burst), Toast.LENGTH_SHORT).show()
                     view.post {
                         (view.parent as ConstraintLayout).removeView(view)
                     }

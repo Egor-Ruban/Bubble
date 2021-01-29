@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         Toast.makeText(
                                 baseContext,
-                                "new bubble should not cover old bubbles",
+                                getString(R.string.overlap),
                                 Toast.LENGTH_SHORT
                         ).show()
                     }
