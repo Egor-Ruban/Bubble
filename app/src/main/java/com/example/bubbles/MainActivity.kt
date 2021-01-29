@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun initDesigns() {
         backgrounds = arrayOf(ContextCompat.getDrawable(baseContext, R.drawable.normal_background),
-                ContextCompat.getDrawable(baseContext, R.drawable.grass),
+                ContextCompat.getDrawable(baseContext, R.drawable.sand),
                 ContextCompat.getDrawable(baseContext, R.color.black))
         texts = arrayOf(getString(R.string.design_normal),
                 getString(R.string.design_weed),
