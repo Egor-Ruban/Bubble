@@ -28,7 +28,6 @@ class Bubble @JvmOverloads constructor(
 
     private lateinit var animation : ViewPropertyAnimator
 
-    private var screenStartY : Int = 0
     private var screenWidth: Int = 0
     private var screenHeight: Int = 0
 
@@ -38,8 +37,7 @@ class Bubble @JvmOverloads constructor(
         }
     }
 
-    fun move(screenStartY : Int, screenWidth: Int, screenHeight: Int){
-        this.screenStartY = screenStartY
+    fun move(screenWidth: Int, screenHeight: Int){
         this.screenWidth = screenWidth
         this.screenHeight = screenHeight
         move()
@@ -62,7 +60,7 @@ class Bubble @JvmOverloads constructor(
         if ((newX <= 0) || (newX >= screenWidth - this.width)) {
             onHitVerticalBorders()
             move()
-        } else if ((newY <= screenStartY) || (newY >= screenHeight - this.height)) {
+        } else if ((newY <= 0) || (newY >= screenHeight - this.height)) {
             onHitHorizontalBorders()
             move()
         } else {
@@ -162,18 +160,18 @@ class Bubble @JvmOverloads constructor(
 
         getLocationInWindow(location)
         val rect1 = Rect(
-                location[0] + 10,
-                location[1] + 10,
-                location[0] + width - 10,
-                location[1] + height - 10
+                location[0] + 15,
+                location[1] + 15,
+                location[0] + width - 15,
+                location[1] + height - 15
         )
 
         bubble.getLocationInWindow(location)
         val rect2 = Rect(
-                location[0] + 10,
-                location[1] + 10,
-                location[0] + bubble.width - 10,
-                location[1] + bubble.height - 10
+                location[0] + 15,
+                location[1] + 15,
+                location[0] + bubble.width - 15,
+                location[1] + bubble.height - 15
         )
 
         return rect1.intersect(rect2)

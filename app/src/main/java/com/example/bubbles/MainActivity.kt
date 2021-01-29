@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.view.MotionEvent
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -37,7 +38,7 @@ class MainActivity : AppCompatActivity() {
                 MotionEvent.ACTION_DOWN -> {
                     val root = binding.field
                     if (isValidPlace(root, event.x, event.y, 220)) {
-                        createBubble(binding.field, 220, binding.startField.y, event.x, event.y)
+                        createBubble(binding.field, 220, binding.field.y, event.x, event.y)
                     } else {
                         Toast.makeText(
                                 baseContext,
@@ -90,12 +91,12 @@ class MainActivity : AppCompatActivity() {
             x = getNewX(eventX, root.width, size)
             y = getNewY(eventY, root.height, top.toInt(), size)
             setOnTouchListener(
-                    BubbleTouchListener(top.toInt(), root.width, root.height, baseContext)
+                    BubbleTouchListener(root.width, root.height, baseContext)
             )
         }
         binding.field.addView(bubble, lParams)
         bubble.post {
-            bubble.move(top.toInt(), binding.field.width, binding.field.height)
+            bubble.move( binding.field.width, binding.field.height)
         }
     }
 
@@ -108,7 +109,7 @@ class MainActivity : AppCompatActivity() {
     private fun getNewY(eventY: Float, height: Int, startOn: Int, size: Int): Float {
         return if ((eventY - size / 2) < startOn) (startOn + 1F)
         else if ((eventY + size / 2) > height) (height - size).toFloat()
-        else (eventY - size / 2)
+        else (eventY - size)
     }
 
     private fun isValidPlace(
@@ -125,20 +126,19 @@ class MainActivity : AppCompatActivity() {
         val location = IntArray(2)
 
         val rect1 = Rect(
-                eventX - size / 2 + 10,
-                eventY - size / 2 + 10,
-                eventX + size / 2 - 10,
-                eventY + size / 2 - 10
+                eventX - size / 2 + 15,
+                eventY - size / 2 + 15,
+                eventX + size / 2 - 15,
+                eventY + size - 15
         )
 
         bubble.getLocationInWindow(location)
         val rect2 = Rect(
-                location[0] + 10,
-                location[1] + 10,
-                location[0] + bubble.width - 10,
-                location[1] + bubble.height - 10
+                location[0] + 15,
+                location[1] + 15,
+                location[0] + bubble.width - 15,
+                location[1] + bubble.height - 15
         )
-
         return rect1.intersect(rect2)
     }
 

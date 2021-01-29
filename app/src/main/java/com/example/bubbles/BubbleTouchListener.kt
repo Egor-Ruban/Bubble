@@ -9,7 +9,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 
 class BubbleTouchListener(
-        private var screenStartY : Int,
         private val screenWidth: Int,
         private val screenHeight: Int,
         private val ctx : Context
@@ -36,7 +35,7 @@ class BubbleTouchListener(
                 newX = event.rawX + dX
                 newY = event.rawY + dY
                 val isOverBorder = (newX <= 0 || newX >= screenWidth - view.width) ||
-                        (newY <= screenStartY || newY >= screenHeight - view.height)
+                        (newY <= 0 || newY >= screenHeight - view.height)
                 if (isOverBorder) {
                     return true
                 }
@@ -52,7 +51,7 @@ class BubbleTouchListener(
                     view.isOnDrag = false
                     view.speedX = (newX - lastX).toDouble()
                     view.speedY = (newY - lastY).toDouble()
-                    view.move(screenStartY, screenWidth, screenHeight)
+                    view.move( screenWidth, screenHeight)
                 } else {
                     view.visibility = View.GONE //todo check ,it may won`t work
                     Toast.makeText(ctx, ctx.getString(R.string.burst), Toast.LENGTH_SHORT).show()
@@ -74,22 +73,22 @@ class BubbleTouchListener(
         return true
     }
 
-    private fun isOverlap(bubble : Bubble, eventX : Int, eventY: Int, size: Int) : Boolean{
+    private fun isOverlap(bubble : Bubble, x : Int, y: Int, size: Int) : Boolean{
         val location = IntArray(2)
 
         val rect1 = Rect(
-                eventX + 10,
-                eventY + 10,
-                eventX + size - 10,
-                eventY + size - 10
+                x + 15,
+                y + 15,
+                x + size - 15,
+                y + size - 15
         )
 
         bubble.getLocationInWindow(location)
         val rect2 = Rect(
-                location[0] + 10,
-                location[1] + 10,
-                location[0] + bubble.width - 10,
-                location[1] + bubble.height - 10
+                location[0] + 15,
+                location[1] + 15,
+                location[0] + bubble.width - 15,
+                location[1] + bubble.height - 15
         )
         return rect1.intersect(rect2)
     }
