@@ -3,10 +3,9 @@ package com.example.bubbles
 
 import android.annotation.SuppressLint
 import android.graphics.Rect
-import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.Log
 import android.view.MotionEvent
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -18,27 +17,38 @@ import kotlin.random.Random
 
 @SuppressLint("ClickableViewAccessibility")
 class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
-    private lateinit var backgrounds : Array<Drawable?>
-    private lateinit var bubbleDesigns : Array<Drawable?>
-    private lateinit var texts : Array<String>
+    private val binding by lazy { ActivityMainBinding.inflate(layoutInflater)}
+    private val backgrounds by lazy {
+        arrayOf(ContextCompat.getDrawable(baseContext, R.drawable.normal_background),
+                ContextCompat.getDrawable(baseContext, R.drawable.sand),
+                ContextCompat.getDrawable(baseContext, R.color.black))
+    }
+    private val bubbleDesigns by lazy {
+        arrayOf(ContextCompat.getDrawable(baseContext, R.drawable.normal_bubble),
+                ContextCompat.getDrawable(baseContext, R.drawable.weed),
+                ContextCompat.getDrawable(baseContext, R.drawable.cherry))
+    }
+    private val texts by lazy {
+        arrayOf(getString(R.string.design_normal),
+                getString(R.string.design_weed),
+                getString(R.string.design_cherry))
+    }
     private var currentDesign = 0
+    private var bubbleSize = 220
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
         val rootView = binding.root
         setContentView(rootView)
 
-        initDesigns()
         binding.field.background = backgrounds[currentDesign]
         binding.design.text = texts[currentDesign]
         rootView.setOnTouchListener { _, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     val root = binding.field
-                    if (isValidPlace(root, event.x, event.y, 220)) {
-                        createBubble(binding.field, 220, binding.field.y, event.x, event.y)
+                    if (isValidPlace(root, event.x, event.y, bubbleSize)) {
+                        createBubble(binding.field, bubbleSize, binding.field.y, event.x, event.y)
                     } else {
                         Toast.makeText(
                                 baseContext,
@@ -68,20 +78,8 @@ class MainActivity : AppCompatActivity() {
         binding.field.forEach { v -> v.background = bubbleDesigns[currentDesign] }
     }
 
-    private fun initDesigns() {
-        backgrounds = arrayOf(ContextCompat.getDrawable(baseContext, R.drawable.normal_background),
-                ContextCompat.getDrawable(baseContext, R.drawable.sand),
-                ContextCompat.getDrawable(baseContext, R.color.black))
-        texts = arrayOf(getString(R.string.design_normal),
-                getString(R.string.design_weed),
-                getString(R.string.design_cherry))
-        bubbleDesigns = arrayOf(ContextCompat.getDrawable(baseContext, R.drawable.normal_bubble),
-                ContextCompat.getDrawable(baseContext, R.drawable.weed),
-                ContextCompat.getDrawable(baseContext, R.drawable.cherry))
-    }
-
     private fun createBubble(
-            root: ConstraintLayout, size: Int, top: Float, eventX: Float, eventY: Float) {
+            root: FrameLayout, size: Int, top: Float, eventX: Float, eventY: Float) {
         val lParams = ConstraintLayout.LayoutParams(size, size)
         val bubble = Bubble(baseContext).apply {
             speedX = Random.nextDouble(-20.0, 20.0)
@@ -90,13 +88,15 @@ class MainActivity : AppCompatActivity() {
             background = bubbleDesigns[currentDesign]
             x = getNewX(eventX, root.width, size)
             y = getNewY(eventY, root.height, top.toInt(), size)
+            screenWidth = root.width
+            screenHeight = root.height
             setOnTouchListener(
                     BubbleTouchListener(root.width, root.height, baseContext)
             )
         }
         binding.field.addView(bubble, lParams)
         bubble.post {
-            bubble.move( binding.field.width, binding.field.height)
+            bubble.move()
         }
     }
 
@@ -113,7 +113,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun isValidPlace(
-            root: ConstraintLayout, eventX: Float, eventY: Float, size: Int): Boolean {
+            root: FrameLayout, eventX: Float, eventY: Float, size: Int): Boolean {
         for (bubble in root.children) {
             if (isOverlap(bubble as Bubble, eventX.toInt(), eventY.toInt(), size)) {
                 return false

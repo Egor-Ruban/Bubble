@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Rect
 import android.view.MotionEvent
 import android.view.View
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
@@ -13,14 +14,14 @@ class BubbleTouchListener(
         private val screenHeight: Int,
         private val ctx : Context
 ) : View.OnTouchListener {
-    private var dX: Float = 0f
-    private var dY: Float = 0f
+    private var dX = 0f
+    private var dY = 0f
 
-    private var lastX : Float = 0f
-    private var lastY : Float = 0f
+    private var lastX = 0f
+    private var lastY = 0f
 
-    private var newX: Float = 0f
-    private var newY: Float = 0f
+    private var newX = 0f
+    private var newY = 0f
 
     override fun onTouch(view: View, event: MotionEvent): Boolean {
         when (event.action) {
@@ -46,14 +47,14 @@ class BubbleTouchListener(
                         .start()
             }
             MotionEvent.ACTION_UP -> {
-                if (isValidPlace(view.parent as ConstraintLayout, newX, newY, view.height, view)){
+                if (isValidPlace(view.parent as FrameLayout, newX, newY, view.height, view)){
                     view as Bubble
                     view.isOnDrag = false
                     view.speedX = (newX - lastX).toDouble()
                     view.speedY = (newY - lastY).toDouble()
-                    view.move( screenWidth, screenHeight)
+                    view.move()
                 } else {
-                    view.visibility = View.GONE //todo check ,it may won`t work
+                    view.visibility = View.GONE
                     Toast.makeText(ctx, ctx.getString(R.string.burst), Toast.LENGTH_SHORT).show()
                     view.post {
                         (view.parent as ConstraintLayout).removeView(view)
@@ -64,7 +65,7 @@ class BubbleTouchListener(
         return true
     }
 
-    private fun isValidPlace(root: ConstraintLayout, x: Float, y: Float, size: Int, v : View): Boolean {
+    private fun isValidPlace(root: FrameLayout, x: Float, y: Float, size: Int, v: View): Boolean {
         for (bubble in root.children){
             if (isOverlap(bubble as Bubble, x.toInt(), y.toInt(), size) && (v != bubble)){
                 return false
