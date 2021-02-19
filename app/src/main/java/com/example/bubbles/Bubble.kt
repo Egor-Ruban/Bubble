@@ -28,15 +28,16 @@ class Bubble @JvmOverloads constructor(
     private var lastX = 1F
     private var lastY = 1F
 
-    private lateinit var animation : ViewPropertyAnimator
+    private var animation : ViewPropertyAnimator? = null
 
     var screenWidth = 0
     var screenHeight = 0
 
     fun cancelAnim(){
-        if (!isStopped()){
-            animation.cancel()
+        if (!isStopped() && animation != null){
+            animation!!.cancel()
         }
+        animation = null
     }
 
     private fun isStopped() = speedX == 0.0 && speedY == 0.0
@@ -65,9 +66,9 @@ class Bubble @JvmOverloads constructor(
     }
 
     private fun doAnimation(newX : Double, newY: Double){
-
+        if (animation != null) cancelAnim()
         animation = animate()
-        animation.x(newX.toFloat())
+        animation!!.x(newX.toFloat())
                 .y(newY.toFloat())
                 .setUpdateListener {
                     for (bubble in (parent as FrameLayout).children){
@@ -91,7 +92,7 @@ class Bubble @JvmOverloads constructor(
     private fun restartMove(){
         x = lastX
         y = lastY
-        animation.cancel()
+        cancelAnim()
         post{
             move()
         }
@@ -100,10 +101,10 @@ class Bubble @JvmOverloads constructor(
     // onHitBubble knows how to deal with hits
     private fun onHitBubble(bubble: Bubble){
         if (bubble.isStopped()){
-            bubble.speedY = 0.5 * speedY
-            bubble.speedX = 0.5 * speedX
-            speedX = -speedX * 0.5
-            speedY = -speedY * 0.5
+            bubble.speedY = speedY * SPEED_PARTITION_COEF
+            bubble.speedX = speedX * SPEED_PARTITION_COEF
+            speedX = -speedX * SPEED_PARTITION_COEF
+            speedY = -speedY * SPEED_PARTITION_COEF
             bubble.post{
                 bubble.move()
             }
@@ -123,8 +124,9 @@ class Bubble @JvmOverloads constructor(
     // randomSpeedChange returns random deviation of speed on hit
     private fun randomSpeedChange(speed : Double) : Double{
         if (abs(speed) < 1) return Random.nextDouble((-5.0), 5.0)
-        return if (speed < 0) Random.nextDouble((speed * 0.20), -(speed * 0.20))
-        else Random.nextDouble(-(speed * 0.20), (speed * 0.20))
+        return if (speed < 0)
+            Random.nextDouble((speed * RANDOM_SPEED_COEF), -(speed * RANDOM_SPEED_COEF))
+        else Random.nextDouble(-(speed * RANDOM_SPEED_COEF), (speed * RANDOM_SPEED_COEF))
     }
 
     // onHitVerticalBorders updates speed of Bubble when hit occurs
@@ -157,18 +159,18 @@ class Bubble @JvmOverloads constructor(
 
         getLocationInWindow(location)
         val rect1 = Rect(
-                location[0] + 15,
-                location[1] + 15,
-                location[0] + width - 15,
-                location[1] + height - 15
+                location[0] + MARGIN_16,
+                location[1] + MARGIN_16,
+                location[0] + width - MARGIN_16,
+                location[1] + height - MARGIN_16
         )
 
         bubble.getLocationInWindow(location)
         val rect2 = Rect(
-                location[0] + 15,
-                location[1] + 15,
-                location[0] + bubble.width - 15,
-                location[1] + bubble.height - 15
+                location[0] + MARGIN_16,
+                location[1] + MARGIN_16,
+                location[0] + bubble.width - MARGIN_16,
+                location[1] + bubble.height - MARGIN_16
         )
 
         return rect1.intersect(rect2)
@@ -178,11 +180,17 @@ class Bubble @JvmOverloads constructor(
     override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
         super.onWindowFocusChanged(hasWindowFocus)
         if (isInFocus){
-            animation.cancel()
+            cancelAnim()
         } else {
             move()
         }
         isInFocus = !isInFocus
+    }
+
+    companion object{
+        private const val SPEED_PARTITION_COEF = 0.5
+        private const val RANDOM_SPEED_COEF = 0.20
+        private const val MARGIN_16 = MainActivity.MARGIN_16
     }
 }
 

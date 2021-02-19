@@ -34,7 +34,6 @@ class MainActivity : AppCompatActivity() {
                 getString(R.string.design_cherry))
     }
     private var currentDesign = 0
-    private var bubbleSize = 220
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,8 +46,8 @@ class MainActivity : AppCompatActivity() {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     val root = binding.field
-                    if (isValidPlace(root, event.x, event.y, bubbleSize)) {
-                        createBubble(binding.field, bubbleSize, binding.field.y, event.x, event.y)
+                    if (isValidPlace(root, event.x, event.y, BUBBLE_SIZE)) {
+                        createBubble(binding.field, BUBBLE_SIZE, binding.field.y, event.x, event.y)
                     } else {
                         Toast.makeText(
                                 baseContext,
@@ -82,8 +81,8 @@ class MainActivity : AppCompatActivity() {
             root: FrameLayout, size: Int, top: Float, eventX: Float, eventY: Float) {
         val lParams = ConstraintLayout.LayoutParams(size, size)
         val bubble = Bubble(baseContext).apply {
-            speedX = Random.nextDouble(-20.0, 20.0)
-            speedY = Random.nextDouble(-20.0, 20.0)
+            speedX = Random.nextDouble(-RANDOM_SPEED_LIMIT, RANDOM_SPEED_LIMIT)
+            speedY = Random.nextDouble(-RANDOM_SPEED_LIMIT, RANDOM_SPEED_LIMIT)
             speedDecreasePercentage = Random.nextInt(5, 20)
             background = bubbleDesigns[currentDesign]
             x = getNewX(eventX, root.width, size)
@@ -134,10 +133,10 @@ class MainActivity : AppCompatActivity() {
 
         bubble.getLocationInWindow(location)
         val rect2 = Rect(
-                location[0] + 15,
-                location[1] + 15,
-                location[0] + bubble.width - 15,
-                location[1] + bubble.height - 15
+                location[0] + MARGIN_16,
+                location[1] + MARGIN_16,
+                location[0] + bubble.width - MARGIN_16,
+                location[1] + bubble.height - MARGIN_16
         )
         return rect1.intersect(rect2)
     }
@@ -146,5 +145,12 @@ class MainActivity : AppCompatActivity() {
         super.onStop()
         binding.field.forEach { v -> (v as Bubble).cancelAnim() }
         binding.field.removeAllViews()
+    }
+
+    companion object{
+        private const val BUBBLE_SIZE = 220
+        private const val RANDOM_SPEED_LIMIT = 20.0
+
+        const val MARGIN_16 = 16
     }
 }

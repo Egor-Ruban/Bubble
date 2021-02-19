@@ -78,19 +78,23 @@ class BubbleTouchListener(
         val location = IntArray(2)
 
         val rect1 = Rect(
-                x + 15,
-                y + 15,
-                x + size - 15,
-                y + size - 15
+                x + MARGIN_16,
+                y + MARGIN_16,
+                x + size - MARGIN_16,
+                y + size - MARGIN_16
         )
 
         bubble.getLocationInWindow(location)
         val rect2 = Rect(
-                location[0] + 15,
-                location[1] + 15,
-                location[0] + bubble.width - 15,
-                location[1] + bubble.height - 15
+                location[0] + MARGIN_16,
+                location[1] + MARGIN_16,
+                location[0] + bubble.width - MARGIN_16,
+                location[1] + bubble.height - MARGIN_16
         )
         return rect1.intersect(rect2)
+    }
+
+    companion object{
+        private const val MARGIN_16 = MainActivity.MARGIN_16
     }
 }
